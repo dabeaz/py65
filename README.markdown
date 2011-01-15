@@ -1,8 +1,9 @@
 # Py65 for Python 3
 
-Note: This is a Python 3 port of Py65 created by David Beazley
-(http://www.dabeaz.com) for his own diabolical amusement and personal
-projects.  Important differences from the standard version:
+Note: This is a Python 3 port of Mike Naberezny's Py65 project
+performed by David Beazley (http://www.dabeaz.com) for his own
+diabolical amusement and personal projects.  Important differences
+from the standard version:
 
 - Py65 is only installed as a library.  If you want to run the
   monitor, use 'python3 -m py65.monitor'.
