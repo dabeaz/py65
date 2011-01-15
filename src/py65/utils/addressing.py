@@ -26,7 +26,7 @@ class AddressParser(object):
     def label_for(self, address, default=None):
         """Given an address, return the corresponding label or a default.
         """
-        for label, label_address in self.labels.iteritems():
+        for label, label_address in self.labels.items():
             if label_address == address:
                 return label
         return default
@@ -80,7 +80,7 @@ class AddressParser(object):
         """
         matches = re.match('^([^:,]+)\s*[:,]+\s*([^:,]+)$', addresses)
         if matches:
-            start, end = map(self.number, matches.groups(0))
+            start, end = list(map(self.number, matches.groups(0)))
         else:
             start = end = self.number(addresses)
 

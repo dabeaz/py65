@@ -4,7 +4,7 @@ import re
 import os
 import tempfile
 from py65.monitor import Monitor
-from StringIO import StringIO
+from io import StringIO
 
 class MonitorTests(unittest.TestCase):
 
@@ -168,7 +168,7 @@ class MonitorTests(unittest.TestCase):
         mon = Monitor(stdout=stdout)
         mon._address_parser.labels['foo'] = 0xc000
         mon.do_delete_label('foo') 
-        self.assertFalse(mon._address_parser.labels.has_key('foo'))
+        self.assertFalse('foo' in mon._address_parser.labels)
         out = stdout.getvalue()
         self.assertEqual('', out)
 
@@ -246,18 +246,15 @@ class MonitorTests(unittest.TestCase):
         stdout = StringIO()
         mon = Monitor(stdout=stdout)
 
-        filename = tempfile.mktemp()
-        try:
-            f = open(filename, 'wb')
-            f.write(chr(0xAA) + chr(0xBB) + chr(0xCC)) 
-            f.close()                     
-
-            mon.do_load("'%s' a600" % filename)
-            self.assertEqual('Wrote +3 bytes from $a600 to $a602\n',
-                             stdout.getvalue())
-            self.assertEqual([0xAA, 0xBB, 0xCC], mon._mpu.memory[0xA600:0xA603])
-        finally:
-            os.unlink(filename)
+        f = tempfile.NamedTemporaryFile()
+        f.write(b'\xaa\xbb\xcc')
+        f.flush()
+        
+        mon.do_load("'%s' a600" % f.name)
+        self.assertEqual([0xAA, 0xBB, 0xCC], mon._mpu.memory[0xA600:0xA603])
+        self.assertEqual('Wrote +3 bytes from $a600 to $a602\n',
+                         stdout.getvalue())
+        f.close()                     
 
     def test_help_load(self):
         stdout = StringIO()
@@ -422,7 +419,7 @@ class MonitorTests(unittest.TestCase):
         mon = Monitor(stdout=stdout)
         mon.do_registers('x=pony')
         out = stdout.getvalue()
-        self.assertEqual("Label not found: pony\n", out)         
+        self.assertEqual("'Label not found: pony'\n", out)         
 
     def test_registers_invalid_register_error(self):
         stdout = StringIO()
@@ -509,19 +506,14 @@ class MonitorTests(unittest.TestCase):
         mon = Monitor(stdout=stdout)
         mon._mpu.memory[0:3] = [0xAA, 0xBB, 0xCC]
 
-        filename = tempfile.mktemp()
-        try:
-            mon.do_save("'%s' 0 2" % filename)
-            self.assertEqual('Saved +3 bytes to %s\n' % filename, 
-                             stdout.getvalue())
-
-            f = open(filename, 'rb')
-            contents = f.read()
-            f.close()
-            self.assertEqual(chr(0xAA) + chr(0xBB) + chr(0xCC),
-                             contents)
-        finally:
-            os.unlink(filename)
+        f = tempfile.NamedTemporaryFile()
+        mon.do_save("'%s' 0 2" % f.name)
+        f.seek(0)
+        self.assertEqual(b'\xaa\xbb\xcc',
+                         f.read())
+        self.assertEqual('Saved +3 bytes to %s\n' % f.name, 
+                         stdout.getvalue())
+        f.close()                     
 
     def test_help_save(self):
         stdout = StringIO()

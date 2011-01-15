@@ -1,3 +1,28 @@
+# Py65 for Python 3
+
+Note: This is a Python 3 port of Py65 created by David Beazley
+(http://www.dabeaz.com) for his own diabolical amusement and personal
+projects.  Important differences from the standard version:
+
+- Py65 is only installed as a library.  If you want to run the
+  monitor, use 'python3 -m py65.monitor'.
+
+- Installation is based on distutils, not setuptools.
+
+- Installation should not conflict with an existing Python-2
+  installation of py65.
+
+- Includes a 'superboard' demo where you can run an emulated
+  1979 OSI Superboard II system and write little Microsoft 
+  Basic 1.0 programs.   It's fun.
+
+So far as I know, this version passes all of the tests contained 
+in src/py65/tests. However, I have not done any testing beyond
+my own use of the library (e.g., "it works for me.")
+
+Note: I do not intend to maintain this branch except as needed for my
+own projects under Python 3.  Use at your own risk. - Dave.
+
 # Py65
 
 Py65 provides tools for simulating hardware based on 6502-like
@@ -15,18 +40,13 @@ microprocessors.  It has the following goals:
    tests so unexpected results are minimized.
    
 ## Installation
-                          
-Py65 packages are [available](http://pypi.python.org/pypi/py65) on the 
-Python Package Index (PyPI).  You download them from there or you can 
-use `easy_install` to automatically install or upgrade Py65:
 
-    $ easy_install -U py65
+Obtain the source from Github (http://github.com/dabeaz/py65).  Please
+note that the original location of the Py65 project is at
+http://github.com/mnaberez/py65/downloads.   Use the following to install
+after you've obtained the source:
 
-Alternatively, you can [download](http://github.com/mnaberez/py65/downloads) 
-a package from GitHub in `.tar.gz` or `.zip` format.  After extracting the 
-package, use the following command to install Py65:
-
-    $ python setup.py install
+    $ python3 setup.py install
 
 ## Devices
 
@@ -44,9 +64,10 @@ The following devices are simulated at this time:
 
 ## Monitor
 
-Py65 includes a console-based machine language monitor (sometimes also called
-a debugger).  This program, `py65mon`, allows you to interact with the
-simulations that you build.  Its features include:
+Py65 includes a console-based machine language monitor (sometimes also
+called a debugger).  This program, launched using 'python3 -m
+py65.monitor' allows you to interact with the simulations that you
+build.  Its features include:
 
  - Commands that are largely compatible with those used in the monitor of
    the popular VICE emulator for Commodore computers.
@@ -74,3 +95,6 @@ These people are responsible for Py65:
 
  - [Ed Spittles](http://github.com/biged) helped with testing and provided 
    many useful issue reports and patches.
+
+ - [Dave Beazley](http://github.com/dabeaz) is the guilty party responsible
+   for this Python 3 port.

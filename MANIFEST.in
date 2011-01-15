@@ -2,3 +2,5 @@ include CHANGES.txt
 include README.markdown
 include LICENSE.txt
 include TODO.txt
+include superboard/*.bin
+include superboard/*.py

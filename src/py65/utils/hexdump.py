@@ -42,15 +42,15 @@ class Loader:
 
     def _parse_address(self, piece):
         try:
-            addr_bytes = [ ord(c) for c in a2b_hex(piece) ]
+            addr_bytes = [ c for c in a2b_hex(piece) ]
         except (TypeError, ValueError):        
             msg = "Could not parse address: %s" % piece
-            raise ValueError, msg
+            raise ValueError(msg)
 
         if len(addr_bytes) != 2:
             msg = "Expected address to be 2 bytes, got %d" % (
                                                     len(addr_bytes))
-            raise ValueError, msg
+            raise ValueError(msg)
 
         address = (addr_bytes[0] << 8) + addr_bytes[1]
 
@@ -62,19 +62,19 @@ class Loader:
             msg = "Non-contigous block detected.  Expected next address " \
                   "to be $%04x, label was $%04x" % (self.current_address, 
                                                                     address)
-            raise ValueError, msg
+            raise ValueError(msg)
 
     def _parse_bytes(self, piece):
         if self.start_address is None:
             msg = "Start address was not found in data"
-            raise ValueError, msg
+            raise ValueError(msg)
 
         else:
             try:
-                bytes = [ ord(c) for c in a2b_hex(piece) ]  
+                bytes = [ c for c in a2b_hex(piece) ]  
             except (TypeError, ValueError):
                 msg = "Could not parse data: %s" % piece
-                raise ValueError, msg
+                raise ValueError(msg)
 
             self.current_address += len(bytes)
             self.data.extend(bytes)

@@ -32,7 +32,7 @@ class Monitor(cmd.Cmd):
             result = cmd.Cmd.onecmd(self, line)
         except KeyboardInterrupt:
             self._output("Interrupt")
-        except Exception,e:
+        except Exception as e:
             (file, fun, line), t, v, tbinfo = compact_traceback()
             error = 'Error: %s, %s: file: %s line: %s' % (t, v, file, line)
             self._output(error)
@@ -85,7 +85,7 @@ class Monitor(cmd.Cmd):
           line = self._shortcuts['~'] + ' ' + line[1:]
       
         # command shortcuts
-        for shortcut, command in self._shortcuts.iteritems():
+        for shortcut, command in self._shortcuts.items():
             if line == shortcut:
                 line = command
                 break
@@ -113,8 +113,8 @@ class Monitor(cmd.Cmd):
             return byte
 
         m = ObservableMemory()
-        m.subscribe_to_write([0xF001], putc)
-        m.subscribe_to_read([0xF004], getc)
+        #m.subscribe_to_write([0xF001], putc)
+        #m.subscribe_to_read([0xF004], getc)
         
         self._mpu.memory = m
 
@@ -150,7 +150,7 @@ class Monitor(cmd.Cmd):
         mpus = {'6502': NMOS6502, '65C02': CMOS65C02}
         
         def available_mpus():
-            mpu_list = ', '.join(mpus.keys())
+            mpu_list = ', '.join(list(mpus.keys()))
             self._output("Available MPUs: %s" % mpu_list)            
         
         if args == '':                      
@@ -315,14 +315,14 @@ class Monitor(cmd.Cmd):
         if args != '':
             new = args[0].lower()
             changed = False
-            for name, radix in radixes.iteritems():
+            for name, radix in radixes.items():
                 if name[0].lower() == new:
                     self._address_parser.radix = radix
                     changed = True
             if not changed:
                 self._output("Illegal radix: %s" % args)
 
-        for name, radix in radixes.iteritems():
+        for name, radix in radixes.items():
             if self._address_parser.radix == radix:
                 self._output("Default radix is %s" % name)
 
@@ -364,8 +364,8 @@ class Monitor(cmd.Cmd):
                     if len(register) == 1:
                         intval &= 0xFF
                     setattr(self._mpu, register, intval)
-                except KeyError, why:
-                    self._output(why[0])
+                except KeyError as why:
+                    self._output(str(why))
     
     def help_cd(self, args):
         self._output("cd <directory>")
@@ -374,8 +374,8 @@ class Monitor(cmd.Cmd):
     def do_cd(self, args):
         try:
             os.chdir(args)
-        except OSError, why:
-            msg = "Cannot change directory: [%d] %s" % (why[0], why[1])
+        except OSError as why:
+            msg = "Cannot change directory: [%d] %s" % (why.errno, why.strerror)
             self._output(msg)
         self.do_pwd()
 
@@ -407,12 +407,14 @@ class Monitor(cmd.Cmd):
             f = open(filename, 'rb')
             bytes = f.read()
             f.close()
-        except (OSError, IOError), why:
+        except (OSError, IOError) as why:
             msg = "Cannot load file: [%d] %s" % (why[0], why[1])
             self._output(msg)
             return
 
-        self._fill(start, start, map(ord, bytes))
+
+#        self._fill(start, start, list(map(ord, bytes)))
+        self._fill(start, start, list(bytes))
 
     def do_save(self, args):
         split = shlex.split(args)
@@ -424,14 +426,13 @@ class Monitor(cmd.Cmd):
         start = self._address_parser.number(split[1])
         end   = self._address_parser.number(split[2])
         
-        bytes = self._mpu.memory[start:end+1]
+        bytes = bytearray(self._mpu.memory[start:end+1])
         try:
             f = open(filename, 'wb')
-            for byte in bytes:
-                f.write(chr(byte))
+            f.write(bytes)
             f.close()
-        except (OSError, IOError), why:
-            msg = "Cannot save file: [%d] %s" % (why[0], why[1])
+        except (OSError, IOError) as why:
+            msg = "Cannot save file: [%d] %s" % (why.errno, why.strerror)
             self._output(msg)
             return
         
@@ -455,7 +456,7 @@ class Monitor(cmd.Cmd):
             return
 
         start, end = self._address_parser.range(split[0])
-        filler = map(self._address_parser.number, split[1:])
+        filler = list(map(self._address_parser.number, split[1:]))
         
         self._fill(start, end, filler)
 
@@ -518,10 +519,10 @@ class Monitor(cmd.Cmd):
         self._output("Display current label mappings.")
 
     def do_show_labels(self, args):
-        values = self._address_parser.labels.values()
-        keys = self._address_parser.labels.keys()
+        values = list(self._address_parser.labels.values())
+        keys = list(self._address_parser.labels.keys())
       
-        byaddress = zip(values, keys)
+        byaddress = list(zip(values, keys))
         byaddress.sort()
         for address, label in byaddress:
             self._output("%04x: %s" % (address, label))

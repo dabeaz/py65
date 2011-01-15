@@ -281,37 +281,21 @@ class MPU:
     data = self.ByteAt(x())
       
     if self.p & self.DECIMAL:
-      halfcarry = 0
-      decimalcarry = 0
-      adjust0 = 0
-      adjust1 = 0
-      nibble0 = (data & 0xf) + (self.a & 0xf) + (self.p & self.CARRY)
-      if nibble0 > 9:
-        adjust0 = 6
-        halfcarry = 1
-      nibble1 = ((data >> 4) & 0xf) + ((self.a >> 4) & 0xf) + halfcarry
-      if nibble1 > 9:
-        adjust1 = 6
-        decimalcarry = 1
-
-      # the ALU outputs are not decimally adjusted
-      nibble0 = nibble0 & 0xf
-      nibble1 = nibble1 & 0xf
-      aluresult = (nibble1 << 4) + nibble0
-
-      # the final A contents will be decimally adjusted
-      nibble0 = (nibble0 + adjust0) & 0xf
-      nibble1 = (nibble1 + adjust1) & 0xf
+      if self.p & self.CARRY:
+        tmp = 1
+      else:
+        tmp = 0
+      data = convert_to_bin(data) + convert_to_bin(self.a) + tmp
       self.p &= ~(self.CARRY+self.OVERFLOW+self.NEGATIVE+self.ZERO)
-      if aluresult == 0:
+      if data > 99:
+        self.p |= self.CARRY + self.OVERFLOW
+        data -= 100
+
+      if data == 0:
         self.p |= self.ZERO
       else:
-        self.p |= aluresult & self.NEGATIVE
-      if decimalcarry == 1:
-        self.p |= self.CARRY
-      if ( ~(self.a ^ data) & (self.a ^ aluresult) ) & 0x80:
-        self.p |= self.OVERFLOW
-      self.a = (nibble1 << 4) + nibble0
+        self.p |= data & 128
+      self.a = convert_to_bcd(data)
     else:
       if self.p & self.CARRY:
         tmp = 1
@@ -328,7 +312,7 @@ class MPU:
       if data == 0:
         self.p |= self.ZERO
       else:
-        self.p |= data & self.NEGATIVE
+        self.p |= data & 128
       self.a = data
 
   def opROR(self, x):
@@ -377,39 +361,21 @@ class MPU:
     data = self.ByteAt(x())
       
     if self.p & self.DECIMAL:
-      halfcarry = 1
-      decimalcarry = 0
-      adjust0 = 0
-      adjust1 = 0
-
-      nibble0 = (self.a & 0xf) + (~data & 0xf) + (self.p & self.CARRY)
-      if nibble0 <= 0xf:
-        halfcarry = 0
-        adjust0 = 10
-      nibble1 = ((self.a >> 4) & 0xf) + ((~data >> 4) & 0xf) + halfcarry
-      if nibble1 <= 0xf:
-        adjust1 = 10 << 4
-
-      # the ALU outputs are not decimally adjusted
-      aluresult = self.a + (~data & 0xFF) + (self.p & self.CARRY)
-      if aluresult > 0xff:
-        decimalcarry = 1
-      aluresult &= 0xff
-
-      # but the final result will be adjusted
-      nibble0 = (aluresult + adjust0) & 0xf
-      nibble1 = ((aluresult + adjust1) >> 4) & 0xf
-
-      self.p &= ~(self.CARRY + self.ZERO + self.NEGATIVE + self.OVERFLOW)
-      if aluresult == 0:
-        self.p |= self.ZERO
+      if self.p & self.CARRY:
+        borrow = 0
       else:
-        self.p |= aluresult & self.NEGATIVE
-      if decimalcarry == 1:
+        borrow = 1
+    
+      data = convert_to_bin(self.a) - convert_to_bin(data) - borrow
+      self.p &= ~(self.CARRY + self.ZERO + self.NEGATIVE + self.OVERFLOW)
+      if data == 0:
+        self.p |= self.ZERO + self.CARRY
+      elif data > 0:
         self.p |= self.CARRY
-      if ( (self.a ^ data) & (self.a ^ aluresult) ) & 0x80:
-        self.p |= self.OVERFLOW
-      self.a = (nibble1 << 4) + nibble0
+      else:
+        self.p |= self.NEGATIVE
+        data +=100
+      self.a = convert_to_bcd(data)
     else:
       if self.p & self.CARRY:
         borrow = 0

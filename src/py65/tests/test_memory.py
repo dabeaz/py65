@@ -56,7 +56,7 @@ class ObservableMemoryTests(unittest.TestCase):
         def read_subscriber(address, value):
             return 0xAB
         
-        mem.subscribe_to_read(xrange(0xC000, 0xC001+1), read_subscriber)
+        mem.subscribe_to_read(range(0xC000, 0xC001+1), read_subscriber)
     
         mem[0xC000] = 0xAB
         mem[0xC001] = 0xAB
@@ -141,7 +141,7 @@ class ObservableMemoryTests(unittest.TestCase):
             return 0xFF
         mem.subscribe_to_write([0xC000,0xC001], write_subscriber)
         
-        mem.write(0xC000, [0x01, 002])
+        mem.write(0xC000, [0x01, 0o02])
         self.assertEqual(0x01, subject[0xC000])
         self.assertEqual(0x02, subject[0xC001])
 
@@ -150,4 +150,10 @@ class ObservableMemoryTests(unittest.TestCase):
     def _make_subject(self):    
         subject = 0x10000 * [0x00] 
         return subject
+
+def test_suite():
+    return unittest.findTestCases(sys.modules[__name__])
+
+if __name__ == '__main__':
+    unittest.main(defaultTest='test_suite')
 
