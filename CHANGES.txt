@@ -1,9 +1,6 @@
-0.9-dev *Next Release*
+0.8-py3k
 
-  - Fixed two monitor tests that were broken under Windows.  Thanks 
-    to Oscar Lindberg for reporting this.
-
-  - Removed use of defaultdict to fix compatibility with Python 2.4.
+  - Port of version 0.8 to Python 3 by David Beazley. 
 
 0.8 (2010-03-08)
 
