@@ -45,7 +45,7 @@ setup(
     maintainer = "David Beazley",
     maintainer_email = "dave@dabeaz.com",
     package_dir = {'py65':'src/py65'},
-    packages = [ 'py65','py65.devices','py65.utils','py65.tests'],
+    packages = [ 'py65','py65.devices','py65.utils','py65.tests','py65.tests.devices','py65.tests.utils'],
     # put data files in egg 'doc' dir
     data_files=[ ('doc', [
         'CHANGES.txt',

@@ -220,6 +220,8 @@ class MonitorTests(unittest.TestCase):
         help_for_command = stdout.getvalue()
 
         stdout.truncate(0)
+        stdout.seek(0)
+
         mon.onecmd("help a \t ")
         help_for_shortcut = stdout.getvalue()
 

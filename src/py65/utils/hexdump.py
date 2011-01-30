@@ -42,7 +42,7 @@ class Loader:
 
     def _parse_address(self, piece):
         try:
-            addr_bytes = [ c for c in a2b_hex(piece) ]
+            addr_bytes = [ c for c in a2b_hex(piece.encode('utf-8') if isinstance(piece,str) else piece) ]
         except (TypeError, ValueError):        
             msg = "Could not parse address: %s" % piece
             raise ValueError(msg)
@@ -71,7 +71,7 @@ class Loader:
 
         else:
             try:
-                bytes = [ c for c in a2b_hex(piece) ]  
+                bytes = [ c for c in a2b_hex(piece.encode('utf-8') if isinstance(piece,str) else piece) ]  
             except (TypeError, ValueError):
                 msg = "Could not parse data: %s" % piece
                 raise ValueError(msg)

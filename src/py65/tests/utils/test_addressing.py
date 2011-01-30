@@ -41,61 +41,61 @@ class AddressParserTests(unittest.TestCase):
   def test_number_label(self):
     parser = AddressParser()
     parser.labels = {'foo': 0xC000}
-    self.assertEquals(0xC000, parser.number('foo'))
+    self.assertEqual(0xC000, parser.number('foo'))
   
   def test_number_bad_label(self):
     parser = AddressParser()
     try:
       parser.number('bad_label')
       self.fail()
-    except KeyError, why:
-      self.assertEqual('Label not found: bad_label', why[0])
+    except KeyError as why:
+      self.assertEqual("'Label not found: bad_label'", str(why))
 
   def test_number_label_hex_offset(self):
     parser = AddressParser()
     parser.labels = {'foo': 0xC000}
-    self.assertEquals(0xC003, parser.number('foo+$3'))
-    self.assertEquals(0xBFFD, parser.number('foo-$3'))
-    self.assertEquals(0xC003, parser.number('foo + $3'))
-    self.assertEquals(0xBFFD, parser.number('foo - $3'))
+    self.assertEqual(0xC003, parser.number('foo+$3'))
+    self.assertEqual(0xBFFD, parser.number('foo-$3'))
+    self.assertEqual(0xC003, parser.number('foo + $3'))
+    self.assertEqual(0xBFFD, parser.number('foo - $3'))
 
   def test_number_label_dec_offset(self):
     parser = AddressParser()
     parser.labels = {'foo': 0xC000}
-    self.assertEquals(0xC003, parser.number('foo++3'))
-    self.assertEquals(0xBFFD, parser.number('foo-+3'))
-    self.assertEquals(0xC003, parser.number('foo + +3'))
-    self.assertEquals(0xBFFD, parser.number('foo - +3'))
+    self.assertEqual(0xC003, parser.number('foo++3'))
+    self.assertEqual(0xBFFD, parser.number('foo-+3'))
+    self.assertEqual(0xC003, parser.number('foo + +3'))
+    self.assertEqual(0xBFFD, parser.number('foo - +3'))
 
   def test_number_label_bin_offset(self):
     parser = AddressParser()
     parser.labels = {'foo': 0xC000}
-    self.assertEquals(0xC003, parser.number('foo+%00000011'))
-    self.assertEquals(0xBFFD, parser.number('foo-%00000011'))
-    self.assertEquals(0xC003, parser.number('foo + %00000011'))
-    self.assertEquals(0xBFFD, parser.number('foo - %00000011'))
+    self.assertEqual(0xC003, parser.number('foo+%00000011'))
+    self.assertEqual(0xBFFD, parser.number('foo-%00000011'))
+    self.assertEqual(0xC003, parser.number('foo + %00000011'))
+    self.assertEqual(0xBFFD, parser.number('foo - %00000011'))
 
   def test_number_label_offset_default_radix(self):
     parser = AddressParser()
     parser.labels = {'foo': 0xC000}
     parser.radix = 16
-    self.assertEquals(0xC010, parser.number('foo+10'))
-    self.assertEquals(0xBFF0, parser.number('foo-10'))
-    self.assertEquals(0xC010, parser.number('foo + 10'))
-    self.assertEquals(0xBFF0, parser.number('foo - 10'))    
+    self.assertEqual(0xC010, parser.number('foo+10'))
+    self.assertEqual(0xBFF0, parser.number('foo-10'))
+    self.assertEqual(0xC010, parser.number('foo + 10'))
+    self.assertEqual(0xBFF0, parser.number('foo - 10'))    
     parser.radix = 10
-    self.assertEquals(0xC00A, parser.number('foo+10'))
-    self.assertEquals(0xBFF6, parser.number('foo-10'))
-    self.assertEquals(0xC00A, parser.number('foo + 10'))
-    self.assertEquals(0xBFF6, parser.number('foo - 10'))    
+    self.assertEqual(0xC00A, parser.number('foo+10'))
+    self.assertEqual(0xBFF6, parser.number('foo-10'))
+    self.assertEqual(0xC00A, parser.number('foo + 10'))
+    self.assertEqual(0xBFF6, parser.number('foo - 10'))    
   
   def test_number_bad_label_with_offset(self):
     parser = AddressParser()
     try:
       parser.number('bad_label+3')
       self.fail()
-    except KeyError, why:
-      self.assertEqual('Label not found: bad_label', why[0])    
+    except KeyError as why:
+      self.assertEqual("'Label not found: bad_label'", str(why))    
 
   def test_number_truncates_address_at_maxwidth_16(self):
     parser = AddressParser()
